@@ -33,6 +33,8 @@ class Player {
     this.frameX = 0;
     this.frameY = 0;
     this.speed = 1;
+    this.vy = 0;
+    this.weight = 0;
 
   }
   draw(context) {
@@ -42,19 +44,34 @@ class Player {
     //context.drawImage(image, sourceX, sourceY, sorceWidth, sourceHeight, xPosition, yPosition, width, height)
   }
   update(input) {
-    //horizontal movement 
-    this.x += this.speed;
+
     if (input.keys.indexOf('ArrowRight') > -1) {
       this.speed = 5;
     }
     else if (input.keys.indexOf('ArrowLeft') > -1) {
       this.speed = -5;
     }
+    else if (input.keys.indexOf('ArrowUp') > -1) {
+      this.vy = -20;
+    }
+    else if (input.keys.indexOf('ArrowDown') > -1) {
+      this.vy = 20;
+    }
     else {
       this.speed = 0;
+      this.vy = 0;
+
     }
+
+    //horizontal movement 
+    this.x += this.speed;
     if (this.x < 0) this.x = 0;
     else if (this.x > this.gameWidth - this.width) this.x = this.gameWidth - this.width
+
+    //vertical movement
+    this.y += this.vy
+    if (this.y < 0) this.y = 0;
+    else if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
   }
 
 }
