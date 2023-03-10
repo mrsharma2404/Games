@@ -34,7 +34,7 @@ class Player {
     this.frameY = 0;
     this.speed = 1;
     this.vy = 0;
-    this.weight = 0;
+    this.weight = 1;
 
   }
   draw(context) {
@@ -46,20 +46,19 @@ class Player {
   update(input) {
 
     if (input.keys.indexOf('ArrowRight') > -1) {
-      this.speed = 5;
+      this.speed = 8;
     }
     else if (input.keys.indexOf('ArrowLeft') > -1) {
-      this.speed = -5;
+      this.speed = -8;
     }
     else if (input.keys.indexOf('ArrowUp') > -1) {
-      this.vy = -20;
+      this.vy -= 4;
     }
-    else if (input.keys.indexOf('ArrowDown') > -1) {
-      this.vy = 20;
-    }
+    // else if (input.keys.indexOf('ArrowDown') > -1) {
+    //   this.vy = 20;
+    // }
     else {
       this.speed = 0;
-      this.vy = 0;
 
     }
 
@@ -70,10 +69,21 @@ class Player {
 
     //vertical movement
     this.y += this.vy
-    if (this.y < 0) this.y = 0;
-    else if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
+    if (!this.onGround()) {
+      this.vy += this.weight
+      this.frameY = 1
+    }
+    else {
+      this.vy = 0;
+      this.frameY = 0
+    }
+    // if (this.y < 0) this.y = 0;
+    if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
   }
 
+  onGround() {
+    return this.y >= this.gameHeight - this.height
+  }
 }
 
 class Backgrounf {
