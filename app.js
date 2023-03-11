@@ -3,6 +3,7 @@ const ctx = canvas.getContext('2d')
 const enemies = []
 canvas.width = 600;
 canvas.height = 720;
+let gameOver = false
 
 class InputHandler {
   constructor() {
@@ -44,12 +45,47 @@ class Player {
 
   }
   draw(context) {
-    context.fillStyle = 'white'
+    // for rectangle or square box filled
+    // context.fillStyle = 'white'
     // context.fillRect(this.x, this.y, this.width, this.height)
-    context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height)
-    //context.drawImage(image, sourceX, sourceY, sorceWidth, sourceHeight, xPosition, yPosition, width, height)
+    // ------ *** -----
+    // for rectangle or square box empty 
+    // context.strokeStyle = 'white'
+    // context.strokeRect(this.x, this.y, this.width, this.height)
+    // ------ *** -----
+    // for circle empty 
+    context.beginPath();
+    context.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+    context.stroke();
+    // ------ *** -----
+    // for drawing the image
+    context.drawImage(
+      this.image,
+      this.frameX * this.width, //sourceX
+      this.frameY * this.height, //sourceY
+      this.width, //sourceWidth
+      this.height, //sourceHeight
+      this.x, //xPosition
+      this.y, //yPosition
+      this.width, //width
+      this.height //height
+    )
+    // ------ *** -----
   }
   update(input, deltaTime) {
+    //collinsion detection
+    enemies.forEach((enemy) => {
+      const dx = enemy.x - this.x
+      const dy = enemy.y - this.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      if (distance < enemy.width / 2 + this.width / 2) {
+        alert('gameOver')
+        gameOver = true
+
+      }
+    })
+    // ------ *** -----
+
     //for sprite animation
     if (this.frameTimer > this.frameInterval) {
       if (this.frameX >= this.maxFrame) this.frameX = 0;
@@ -59,6 +95,8 @@ class Player {
     else {
       this.frameTimer += deltaTime
     }
+    // ------ *** -----
+
 
     //for controls
     if (input.keys.indexOf('ArrowRight') > -1) {
@@ -75,7 +113,6 @@ class Player {
     // }
     else {
       this.speed = 0;
-
     }
 
     //horizontal movement 
@@ -143,7 +180,11 @@ class Enemy {
     this.speed = 4;
   }
   draw(context) {
-    // context.drawImage(this.image, this.x, this.y)
+    // for circle empty 
+    context.beginPath();
+    context.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+    context.stroke();
+    // ------ *** -----
     context.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height)
 
   }
@@ -198,7 +239,7 @@ function animate(timestamp) {
   player.draw(ctx);
   player.update(input, deltaTime);
   handleEnemies(deltaTime);
-  requestAnimationFrame(animate); //this requestAnimationFrame will automatically pass timestamp to animate functio 
+  if (!gameOver) requestAnimationFrame(animate); //this requestAnimationFrame will automatically pass timestamp to animate functio 
 }
 
 
