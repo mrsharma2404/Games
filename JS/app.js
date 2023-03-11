@@ -1,15 +1,17 @@
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d')
 const enemies = []
-canvas.width = 600;
-canvas.height = 720;
+const coins = []
+let coinsCollected = [];
+
+canvas.width = 1100;
+canvas.height = 600;
 let gameOver = false
 
 class InputHandler {
   constructor() {
     this.keys = []
     window.addEventListener('keydown', e => {
-      console.log({ e })
       if ((e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')
         && this.keys.indexOf(e.key) === -1) {
         this.keys.push(e.key)
@@ -54,9 +56,9 @@ class Player {
     // context.strokeRect(this.x, this.y, this.width, this.height)
     // ------ *** -----
     // for circle empty 
-    context.beginPath();
-    context.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
-    context.stroke();
+    // context.beginPath();
+    // context.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+    // context.stroke();
     // ------ *** -----
     // for drawing the image
     context.drawImage(
@@ -73,15 +75,31 @@ class Player {
     // ------ *** -----
   }
   update(input, deltaTime) {
+    console.log('enemy - , enemy.x, this.x, dx, dy, distance, enemy.width / 2 + this.width / 2 ')
+
     //collinsion detection
     enemies.forEach((enemy) => {
-      const dx = enemy.x - this.x
-      const dy = enemy.y - this.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
-      if (distance < enemy.width / 2 + this.width / 2) {
-        alert('gameOver')
+      let dx = enemy.x - this.x
+      let dy = enemy.y - this.y
+      let distance = Math.sqrt(dx * dx + dy * dy)
+      console.log('enemy - ', enemy.x, this.x, dx, dy, distance, enemy.width / 2 + this.width / 2)
+
+      if (distance + 10 < enemy.width / 2 + this.width / 2) {
+        alert(`gameOver ${coinsCollected.length}`)
         gameOver = true
 
+      }
+    })
+
+    coins.forEach((coin, idx) => {
+      let dx = coin.x - this.x
+      let dy = coin.y - this.y
+      let distance = Math.sqrt(dx * dx + dy * dy)
+      console.log('coin - ', coin.x, this.x, dx, dy, distance, coin.width / 2 + this.width / 2)
+      if (distance < coin.width / 2 + this.width / 2) {
+        // alert('gameOver')
+        console.log({ coinsCollected })
+        if (!coinsCollected.includes(idx)) coinsCollected.push(idx)
       }
     })
     // ------ *** -----
@@ -141,6 +159,7 @@ class Player {
   }
 }
 
+
 class Background {
   constructor(gameWidth, gameHeight) {
     this.gameWidth = gameWidth
@@ -181,9 +200,9 @@ class Enemy {
   }
   draw(context) {
     // for circle empty 
-    context.beginPath();
-    context.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
-    context.stroke();
+    // context.beginPath();
+    // context.arc(this.x + this.width / 2, this.y + this.height / 2, this.width / 2, 0, Math.PI * 2);
+    // context.stroke();
     // ------ *** -----
     context.drawImage(this.image, this.frameX * this.width, 0, this.width, this.height, this.x, this.y, this.width, this.height)
 
@@ -200,6 +219,32 @@ class Enemy {
   }
 }
 
+class Coin {
+  constructor(gameWidth, gameHeight) {
+    this.gameWidth = gameWidth
+    this.gameHeight = gameHeight
+    this.width = 100;
+    this.height = 90;
+    this.image = document.getElementById('coinImage')
+    this.x = this.gameWidth;
+    this.y = this.gameHeight - this.height;
+    this.frameX = 0;
+    this.speed = 4;
+  }
+  draw(context) {
+    context.drawImage(this.image, this.x, this.y, this.width, this.height)
+  }
+  update() {
+    this.x -= this.speed;
+  }
+}
+let lastTime = 0
+let enemyTimer = 0;
+let randomEnemyInterval = (Math.random() * 5000) + 1000
+let coinTimer = 0;
+let randomcoinInterval = 1500
+
+
 function handleEnemies(deltaTime) {
   if (enemyTimer > randomEnemyInterval) {
     enemies.push(new Enemy(canvas.width, canvas.height))
@@ -213,11 +258,19 @@ function handleEnemies(deltaTime) {
     enemy.draw(ctx)
     enemy.update(deltaTime)
   })
-
-
 }
-function displayStatusText() {
-
+function handleCoins(deltaTime) {
+  if (coinTimer > randomcoinInterval) {
+    coins.push(new Coin(canvas.width, canvas.height))
+    randomcoinInterval = 1500//(Math.random() * 5000) + 1000
+    coinTimer = 0;
+  }
+  else {
+    coinTimer += deltaTime
+  }
+  coins.forEach((coin, idx) => {
+    if (!coinsCollected.includes(idx)) coin.draw(ctx), coin.update()
+  })
 }
 
 const input = new InputHandler()
@@ -226,16 +279,14 @@ const background = new Background(canvas.width, canvas.height)
 
 // player.draw(ctx);
 // update();
-let lasteTime = 0
-let enemyTimer = 0;
-let enemyInterval = 2000;
-let randomEnemyInterval = (Math.random() * 5000) + 1000
+
 function animate(timestamp) {
-  const deltaTime = timestamp - lasteTime;
-  lasteTime = timestamp
+  const deltaTime = timestamp - lastTime;
+  lastTime = timestamp
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   background.draw(ctx);
   background.update();
+  handleCoins(deltaTime);
   player.draw(ctx);
   player.update(input, deltaTime);
   handleEnemies(deltaTime);
