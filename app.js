@@ -36,6 +36,11 @@ class Player {
     this.speed = 1;
     this.vy = 0;
     this.weight = 1;
+    //for player animation
+    this.maxFrame = 8;
+    this.fps = 40
+    this.frameTimer = 0;
+    this.frameInterval = 1000 / this.fps;
 
   }
   draw(context) {
@@ -44,8 +49,18 @@ class Player {
     context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height)
     //context.drawImage(image, sourceX, sourceY, sorceWidth, sourceHeight, xPosition, yPosition, width, height)
   }
-  update(input) {
+  update(input, deltaTime) {
+    //for sprite animation
+    if (this.frameTimer > this.frameInterval) {
+      if (this.frameX >= this.maxFrame) this.frameX = 0;
+      else this.frameX++;
+      this.frameTimer = 0;
+    }
+    else {
+      this.frameTimer += deltaTime
+    }
 
+    //for controls
     if (input.keys.indexOf('ArrowRight') > -1) {
       this.speed = 8;
     }
@@ -73,10 +88,12 @@ class Player {
     if (!this.onGround()) {
       this.vy += this.weight
       this.frameY = 1
+      this.maxFrame = 5; //for sprite animation 
     }
     else {
       this.vy = 0;
       this.frameY = 0
+      this.maxFrame = 8; //for sprite animation
     }
     // if (this.y < 0) this.y = 0;
     if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
@@ -179,7 +196,7 @@ function animate(timestamp) {
   background.draw(ctx);
   background.update();
   player.draw(ctx);
-  player.update(input);
+  player.update(input, deltaTime);
   handleEnemies(deltaTime);
   requestAnimationFrame(animate); //this requestAnimationFrame will automatically pass timestamp to animate functio 
 }
