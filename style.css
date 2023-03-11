@@ -6,7 +6,7 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100px;
+  height: 50px;
   color: #e0e0e0;
   font-size: 22px;
   font-family: monospace;
@@ -14,7 +14,7 @@ body {
 }
 #canvas1 {
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   border: 2px solid #e9e9e9;
