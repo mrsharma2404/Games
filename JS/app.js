@@ -1,3 +1,4 @@
+const result = document.getElementById('resultDiv')
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d')
 const enemies = []
@@ -281,6 +282,9 @@ const background = new Background(canvas.width, canvas.height)
 // update();
 
 function animate(timestamp) {
+
+
+  document.getElementById('resultDiv').innerHTML = `score - ${coinsCollected.length}`;
   const deltaTime = timestamp - lastTime;
   lastTime = timestamp
   ctx.clearRect(0, 0, canvas.width, canvas.height);
