@@ -125,7 +125,8 @@ class Player {
       this.speed = -8;
     }
     else if (input.keys.indexOf('ArrowUp') > -1) {
-      this.vy -= 4;
+      if (this.y <= 0) this.y = 0;
+      else this.vy -= 4;
     }
     // else if (input.keys.indexOf('ArrowDown') > -1) {
     //   this.vy = 20;
@@ -151,8 +152,10 @@ class Player {
       this.frameY = 0
       this.maxFrame = 8; //for sprite animation
     }
-    // if (this.y < 0) this.y = 0;
+    if (this.y < 0) this.y = 0;
     if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
+    // if (this.y > this.gameHeight - this.height) this.y = this.gameHeight - this.height
+
   }
 
   onGround() {
